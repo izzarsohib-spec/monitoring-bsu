@@ -1,0 +1,17 @@
+/* Tambahan kecil di atas tema.css (salinan gaya halaman Monitoring pengisian seragam). */
+.mobnav a.mobhome { flex:none; padding:8px 14px; border:1px solid var(--stroke); border-radius:99px; color:var(--muted); text-decoration:none; }
+
+.dlg { border:1px solid var(--stroke); border-radius:20px; padding:22px 24px; width:min(420px, calc(100vw - 32px)); background:#fff; color:#1b2433; box-shadow:0 24px 60px rgba(15,23,42,.25); }
+.dlg::backdrop { background:rgba(15,23,42,.45); }
+.dlg h3 { margin:0 0 6px; font-size:1.15rem; }
+.dlg p { margin:0 0 14px; font-size:.86rem; }
+.dlg label { display:block; font-size:.8rem; font-weight:600; margin-bottom:12px; }
+.dlg input { display:block; width:100%; margin-top:5px; padding:10px 12px; border:1px solid #DCE3EC; border-radius:12px; font:inherit; background:#fff; color:inherit; }
+.dlg .aksi { display:flex; justify-content:flex-end; gap:8px; margin-top:6px; }
+.dlg .utama { background:#2F7F79; color:#fff; border-color:#2F7F79; }
+.dlg .galat { margin:0 0 10px; padding:9px 12px; border-radius:12px; background:#FBE9E7; color:#9A3B2F; font-size:.84rem; }
+
+.toast-box { position:fixed; top:14px; right:14px; z-index:90; display:flex; flex-direction:column; gap:8px; width:min(360px, calc(100vw - 28px)); }
+.toast-box .toast { background:#1f2a37; color:#fff; border:0; border-left:4px solid #7fd957; border-radius:14px; padding:10px 14px; box-shadow:0 8px 24px rgba(15,23,42,.3); font-size:.84rem; }
+.toast-box .toast.bad { border-left-color:#ff8a80; }
+.klik-tabel { cursor:default; }

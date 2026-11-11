@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Administrator · Monitoring BSU 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="tema.css">
+<link rel="stylesheet" href="tema-terang.css">
+<link rel="stylesheet" href="tambah-pantau.css">
+<link rel="stylesheet" href="admin-gaya.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="home" href="index.html" title="Monitoring BSU" aria-label="Monitoring BSU"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Monitoring BSU</span></a>
+    <button data-href="index.html" title="Monitoring Pengisian" aria-label="Monitoring Pengisian"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Monitoring Pengisian</span></button>
+    <button class="on" data-href="admin.html#admin" title="Administrator" aria-label="Administrator"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg><span>Administrator</span></button>
+    <div class="sp"></div>
+  </aside>
+
+  <div class="content">
+   <nav class="mobnav" id="mobnav"><button data-href="index.html">Monitoring</button><button class="on" data-href="admin.html#admin">Administrator</button></nav>
+   <nav class="chips subtabs" id="subtabs"></nav>
+
+   <div class="page adm" id="pg-admin">
+    <header id="kepala"></header>
+    <section id="isi"></section>
+   </div>
+  </div>
+</div>
+
+<dialog id="dlg-masuk" class="dlg">
+  <form id="form-masuk" method="dialog">
+    <h3>Masuk</h3>
+    <p class="muted">Masuk untuk melihat nama peserta dan mengelola data. Akun dibuat oleh administrator.</p>
+    <label>Email<input type="email" id="in-email" autocomplete="username" required></label>
+    <label>Kata sandi<input type="password" id="in-sandi" autocomplete="current-password" required></label>
+    <div id="galat-masuk" class="galat" hidden></div>
+    <div class="aksi"><button type="button" class="btn" id="batal-masuk">Batal</button><button type="submit" class="btn utama" id="ok-masuk">Masuk</button></div>
+  </form>
+</dialog>
+<dialog id="dlg-sandi" class="dlg">
+  <form id="form-sandi" method="dialog">
+    <h3>Ganti kata sandi</h3>
+    <label>Kata sandi baru<input type="password" id="in-sandi-baru" autocomplete="new-password" minlength="8" required></label>
+    <label>Ulangi kata sandi baru<input type="password" id="in-sandi-ulang" autocomplete="new-password" minlength="8" required></label>
+    <div id="galat-sandi" class="galat" hidden></div>
+    <div class="aksi"><button type="button" class="btn" id="batal-sandi">Batal</button><button type="submit" class="btn utama">Simpan</button></div>
+  </form>
+</dialog>
+<div class="toast-box" id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="core.js"></script>
+<script src="admin.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

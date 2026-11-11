@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Monitoring BSU 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="tema.css">
+<link rel="stylesheet" href="tema-terang.css">
+<link rel="stylesheet" href="tambah-pantau.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="home" href="index.html" title="Monitoring BSU" aria-label="Monitoring BSU"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Monitoring BSU</span></a>
+    <button class="on" data-pg="monitor" title="Monitoring Pengisian" aria-label="Monitoring Pengisian"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Monitoring Pengisian</span></button>
+    <button data-href="admin.html#admin" title="Administrator" aria-label="Administrator"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg><span>Administrator</span></button>
+    <div class="sp"></div>
+  </aside>
+
+  <div class="content">
+   <nav class="mobnav" id="mobnav"><button class="on" data-pg="monitor">Monitoring</button><a class="mobhome" href="admin.html#admin">Administrator</a></nav>
+   <nav class="chips subtabs" id="subtabs"><button class="chip on" data-pg="monitor">Monitoring pengisian</button></nav>
+
+   <div class="page" id="pg-monitor">
+    <header>
+      <div>
+        <h1>Monitoring Pengisian</h1>
+        <div class="sub" id="info">Memuat data…</div>
+        <div class="sub" id="segar" style="font-size:.74rem;opacity:.8"></div>
+      </div>
+      <div>
+        <div class="kode card" style="border-radius:99px">
+          <span id="labelKode">Nama peserta</span>
+          <button class="btn" id="btnKode">Buka (login)</button>
+        </div>
+        <div id="pesan"></div>
+      </div>
+    </header>
+
+    <section class="top">
+      <div class="hero card">
+        <div>
+          <small>Data penerima BSU 2026</small>
+          <h2>Pantau kelengkapan data tiap lokasi</h2>
+          <div class="rabtotal"><small>Peserta sudah mengisi Google Form dari total peserta</small><b class="num" id="rabTotal">-</b></div>
+        </div>
+        <div class="ringhero" id="ringhero"></div>
+        <div class="kpi" id="kpi"></div>
+      </div>
+      <div class="rcol">
+        <div class="chartcard card">
+          <div class="ttl"><b>5 lokasi dengan peserta terbanyak yang belum mengisi</b></div>
+          <div class="areachips" id="areaChips" role="group" aria-label="Saring menurut wilayah"></div>
+          <div id="topKurang"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="duo">
+    <section class="pantau" id="pantau">
+      <div class="card pcard lipat">
+        <div class="ttl lipat-h" role="button" tabindex="0" aria-expanded="true"><div><b>Progres pengisian per wilayah</b><small>Jumlah lokasi tiap wilayah menurut tahap pengisian Google Form</small></div></div>
+        <div class="legend" id="picLegenda" style="margin:2px 0 8px"></div>
+        <div id="picBar"></div>
+      </div>
+    </section>
+
+    <section class="bawah card" id="bawah">
+      <div class="bar-top">
+        <h3>Daftar lokasi</h3>
+        <label class="search"><span aria-hidden="true">🔍</span>
+          <input id="cari" type="search" placeholder="Cari lokasi, mis. pengadilan negeri kudus" autocomplete="off">
+        </label>
+        <select id="fWil" class="psel" aria-label="Filter wilayah"></select>
+      </div>
+      <div class="chips" id="chips" style="margin-bottom:14px"></div>
+      <div class="layout">
+        <div class="list"><div class="scroll" id="daftar"></div></div>
+        <div class="detail" id="detail"></div>
+      </div>
+    </section>
+    </div>
+   </div>
+  </div>
+</div>
+
+<dialog id="dlg-masuk" class="dlg">
+  <form id="form-masuk" method="dialog">
+    <h3>Masuk</h3>
+    <p class="muted">Masuk sebagai admin untuk melihat nama peserta. Akun dibuat oleh administrator.</p>
+    <label>Email<input type="email" id="in-email" autocomplete="username" required></label>
+    <label>Kata sandi<input type="password" id="in-sandi" autocomplete="current-password" required></label>
+    <div id="galat-masuk" class="galat" hidden></div>
+    <div class="aksi"><button type="button" class="btn" id="batal-masuk">Batal</button><button type="submit" class="btn utama" id="ok-masuk">Masuk</button></div>
+  </form>
+</dialog>
+<div class="toast-box" id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="core.js"></script>
+<script src="pantau.js"></script>
+</body>
+</html>

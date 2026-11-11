@@ -1,0 +1,12 @@
+# Data peserta (nama, NIK, rekening) tidak boleh masuk repo
+data/
+supabase/*.csv
+*.xlsx
+*.xls
+
+# Rahasia dan berkas sementara
+.env
+.env.*
+*.tmp
+_uji.html
+node_modules/
