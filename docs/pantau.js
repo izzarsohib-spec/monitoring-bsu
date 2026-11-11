@@ -222,11 +222,115 @@
     renderDaftar();
   }
 
+  // ---------- rekap kekurangan (WhatsApp lewat WAHA di VPS, via Edge Function kirim-rekap-bsu) ----------
+  const sb = B.sb;
+  const R = { rows: [], penerima: new Map() };
+  const MAKS = 3500; // batas aman per pesan WhatsApp
+  const tglRekap = () => new Date().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+
+  function susunTeks(w, denganNama) {
+    const per = new Map();
+    for (const r of R.rows.filter((x) => x.wilayah === w)) {
+      if (!per.has(r.lokasi_id)) per.set(r.lokasi_id, { nama: r.lokasi, id: r.lokasi_id, orang: [] });
+      per.get(r.lokasi_id).orang.push(r.nama);
+    }
+    const daftar = [...per.values()].sort((a, b) => b.orang.length - a.orang.length || a.nama.localeCompare(b.nama));
+    const total = daftar.reduce((a, l) => a + l.orang.length, 0);
+    const blok = ['*REKAP KEKURANGAN PENGISIAN DATA BSU*\nWilayah: *' + w + '*\nPer ' + tglRekap() + '\n\nBelum mengisi Google Form: *' + idn(total) + ' orang* di ' + daftar.length + ' lokasi.'];
+    daftar.forEach((l, i) => {
+      const lk = semua.find((x) => x.id === l.id);
+      let t = (i + 1) + '. *' + l.nama + '*: ' + l.orang.length + ' orang belum' + (lk ? ' (sudah ' + lk.isi + ' dari ' + lk.target + ')' : '');
+      if (denganNama) t += '\n' + l.orang.slice().sort((a, b) => a.localeCompare(b)).map((n) => '   - ' + n).join('\n');
+      blok.push(t);
+    });
+    blok.push('Mohon dibantu mengingatkan rekan-rekan yang belum mengisi. Terima kasih.');
+    return { teks: blok.join('\n\n'), total, lokasi: daftar.length };
+  }
+  // pecah teks menjadi bagian <= MAKS karakter, memotong di batas antar-lokasi (baris kosong)
+  function pecah(teks) {
+    const hasil = []; let sekarang = '';
+    for (const b of teks.split('\n\n')) {
+      if (sekarang && (sekarang + '\n\n' + b).length > MAKS) { hasil.push(sekarang); sekarang = b; }
+      else sekarang = sekarang ? sekarang + '\n\n' + b : b;
+      while (sekarang.length > MAKS) { hasil.push(sekarang.slice(0, MAKS)); sekarang = sekarang.slice(MAKS); }
+    }
+    if (sekarang.trim()) hasil.push(sekarang);
+    return hasil;
+  }
+
+  async function muatRekap() {
+    $('rk-isi').innerHTML = '<div class="muted">Memuat…</div>';
+    const [r, p] = await Promise.all([sb.rpc('rekap_kekurangan'), sb.from('wa_penerima').select('wilayah,nama,nomor')]);
+    if (r.error) { $('rk-isi').innerHTML = '<div class="galat-rk">Gagal membuat rekap: ' + esc(B.galat(r.error)) + '</div>'; return; }
+    R.rows = r.data || [];
+    R.penerima = new Map((p.data || []).map((x) => [x.wilayah, x]));
+    const wil = [...new Set(R.rows.map((x) => x.wilayah))].sort();
+    const dipilih = $('rk-wilayah').value;
+    $('rk-wilayah').innerHTML = '<option value="">Semua wilayah (' + wil.length + ')</option>' + wil.map((w) => '<option value="' + esc(w) + '">' + esc(w) + '</option>').join('');
+    $('rk-wilayah').value = wil.includes(dipilih) ? dipilih : '';
+    gambarRekap();
+  }
+  function gambarRekap() {
+    const pilih = $('rk-wilayah').value, nama = $('rk-nama').checked;
+    const wil = [...new Set(R.rows.map((x) => x.wilayah))].sort().filter((w) => !pilih || w === pilih);
+    if (!wil.length) { $('rk-isi').innerHTML = '<div class="kosongnya">Tidak ada yang perlu direkap: semua peserta sudah mengisi.</div>'; return; }
+    $('rk-isi').innerHTML = wil.map((w) => {
+      const s = susunTeks(w, nama), pn = R.penerima.get(w) || {};
+      return '<section class="rk-blok" data-w="' + esc(w) + '">' +
+        '<div class="rk-head"><b>' + esc(w) + '</b><span>' + s.lokasi + ' lokasi · ' + idn(s.total) + ' orang belum mengisi · <em class="rk-bagian">' + pecah(s.teks).length + '</em> pesan</span></div>' +
+        '<textarea class="rk-teks" rows="10" spellcheck="false">' + esc(s.teks) + '</textarea>' +
+        '<div class="rk-kirim">' +
+        '<label>Kirim ke<input class="rk-pn" placeholder="Nama koordinator" value="' + esc(pn.nama || '') + '"></label>' +
+        '<label>No. WhatsApp<input class="rk-pk" placeholder="0812xxxxxxxx" inputmode="tel" value="' + esc(pn.nomor ? '0' + pn.nomor.slice(2) : '') + '"></label>' +
+        '<button class="btn" data-salin type="button">Salin teks</button>' +
+        '<button class="btn utama" data-kirim type="button">Kirim ke WhatsApp</button>' +
+        '</div></section>';
+    }).join('');
+  }
+  async function kirimRekap(blok) {
+    const w = blok.dataset.w, teks = blok.querySelector('.rk-teks').value, nama = blok.querySelector('.rk-pn').value.trim(), nomor = blok.querySelector('.rk-pk').value.trim();
+    if (!nomor) return B.toast('Isi nomor WhatsApp penerima untuk ' + w + '.', true);
+    const bagian = pecah(teks);
+    if (!confirm('Kirim rekap ' + w + ' (' + bagian.length + ' pesan) ke ' + (nama || 'penerima') + ' (' + nomor + ') lewat WhatsApp?')) return;
+    const tombol = blok.querySelector('[data-kirim]'); tombol.disabled = true; tombol.textContent = 'Mengirim…';
+    try {
+      const s = await sb.rpc('simpan_penerima_wa', { p_wilayah: w, p_nama: nama, p_nomor: nomor });
+      if (s.error) throw s.error;
+      const ses = (await sb.auth.getSession()).data.session;
+      const r = await fetch(B.C.url + '/functions/v1/kirim-rekap-bsu', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + (ses ? ses.access_token : ''), apikey: B.C.anonKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wilayah: w, teks: bagian }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.ok) throw new Error(j.error || 'Gagal mengirim (HTTP ' + r.status + ')');
+      B.toast(j.mode_uji ? 'MODE UJI: ' + j.terkirim + ' pesan masuk ke nomor uji, bukan ke ' + (j.penerima || 'penerima') + '.' : 'Terkirim ke ' + (j.penerima || 'penerima') + ' (' + j.terkirim + ' pesan).');
+      R.penerima.set(w, { wilayah: w, nama, nomor: s.data });
+    } catch (e) { B.toast(B.galat(e), true); }
+    tombol.disabled = false; tombol.textContent = 'Kirim ke WhatsApp';
+  }
+  async function salin(teks) {
+    try { await navigator.clipboard.writeText(teks); }
+    catch (e) { const t = document.createElement('textarea'); t.value = teks; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    B.toast('Teks disalin.');
+  }
+  $('btnRekap').onclick = () => { $('dlg-rekap').showModal(); muatRekap(); };
+  $('rk-tutup').onclick = () => $('dlg-rekap').close();
+  $('rk-buat').onclick = muatRekap;
+  $('rk-wilayah').onchange = gambarRekap;
+  $('rk-nama').onchange = gambarRekap;
+  $('rk-isi').addEventListener('click', (e) => {
+    const blok = e.target.closest('.rk-blok'); if (!blok) return;
+    if (e.target.closest('[data-salin]')) salin(blok.querySelector('.rk-teks').value);
+    if (e.target.closest('[data-kirim]')) kirimRekap(blok);
+  });
+  $('rk-isi').addEventListener('input', (e) => { if (e.target.classList.contains('rk-teks')) e.target.closest('.rk-blok').querySelector('.rk-bagian').textContent = pecah(e.target.value).length; });
+
   // ---- login ----
   function labelLogin() {
     $('labelKode').textContent = B.admin() ? 'Nama peserta: terbuka' : 'Nama peserta';
     $('btnKode').textContent = B.admin() ? 'Keluar' : 'Buka (login)';
     $('pesan').textContent = B.user && !B.admin() ? 'Akun ini bukan admin.' : '';
+    $('rekapAksi').hidden = !B.admin();
   }
   $('btnKode').onclick = async () => {
     if (B.user) { await B.keluar(); labelLogin(); await muatRincian(); renderDetail(); return; }

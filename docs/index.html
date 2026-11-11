@@ -64,6 +64,10 @@
         <div class="ttl lipat-h" role="button" tabindex="0" aria-expanded="true"><div><b>Progres pengisian per wilayah</b><small>Jumlah lokasi tiap wilayah menurut tahap pengisian Google Form</small></div></div>
         <div class="legend" id="picLegenda" style="margin:2px 0 8px"></div>
         <div id="picBar"></div>
+        <div class="rekap-aksi" id="rekapAksi" hidden>
+          <button class="btn utama" id="btnRekap">Buatkan rekap kekurangan</button>
+          <span class="muted">Daftar yang belum mengisi per wilayah, siap dikirim lewat WhatsApp</span>
+        </div>
       </div>
     </section>
 
@@ -95,6 +99,16 @@
     <div id="galat-masuk" class="galat" hidden></div>
     <div class="aksi"><button type="button" class="btn" id="batal-masuk">Batal</button><button type="submit" class="btn utama" id="ok-masuk">Masuk</button></div>
   </form>
+</dialog>
+<dialog id="dlg-rekap" class="dlg dlg-rekap">
+  <div class="rk-kop"><h3>Rekap kekurangan pengisian</h3><button class="btn" id="rk-tutup" type="button">Tutup</button></div>
+  <p class="muted">Siapa saja yang belum mengisi Google Form, per wilayah. Teks boleh diedit sebelum dikirim.</p>
+  <div class="rk-alat">
+    <label>Wilayah<select id="rk-wilayah"></select></label>
+    <label class="rk-cek"><input type="checkbox" id="rk-nama" checked> Sertakan nama</label>
+    <button class="btn" id="rk-buat" type="button">Buat ulang</button>
+  </div>
+  <div id="rk-isi"><div class="muted">Memuat…</div></div>
 </dialog>
 <div class="toast-box" id="toasts" aria-live="polite"></div>
 

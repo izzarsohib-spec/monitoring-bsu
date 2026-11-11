@@ -15,3 +15,26 @@
 .toast-box .toast { background:#1f2a37; color:#fff; border:0; border-left:4px solid #7fd957; border-radius:14px; padding:10px 14px; box-shadow:0 8px 24px rgba(15,23,42,.3); font-size:.84rem; }
 .toast-box .toast.bad { border-left-color:#ff8a80; }
 .klik-tabel { cursor:default; }
+
+/* Rekap kekurangan */
+.rekap-aksi { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid var(--stroke); }
+.rekap-aksi[hidden] { display:none; }
+.rekap-aksi .muted { font-size:.78rem; }
+.rekap-aksi .btn.utama, .dlg-rekap .btn.utama { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; padding:7px 18px; }
+.rekap-aksi .btn.utama:hover, .dlg-rekap .btn.utama:hover { background:#26665F; border-color:#26665F; color:#fff; }
+.dlg.dlg-rekap { width:min(900px, calc(100vw - 32px)); max-height:calc(100vh - 40px); overflow:auto; padding:22px 26px; }
+.rk-kop { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.rk-kop h3 { margin:0; }
+.rk-alat { display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin:6px 0 14px; }
+.rk-alat label { margin:0; font-weight:600; font-size:.8rem; }
+.rk-alat select { display:block; margin-top:5px; padding:9px 12px; border:1px solid var(--stroke); border-radius:12px; font:inherit; font-size:.88rem; background:#fff; }
+.rk-alat .rk-cek { display:flex; align-items:center; gap:6px; font-weight:500; padding-bottom:9px; }
+.rk-alat .rk-cek input { width:auto; margin:0; }
+.rk-blok { border:1px solid var(--stroke); border-radius:16px; padding:14px 16px; margin-bottom:14px; background:var(--lembut2); }
+.rk-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+.rk-head span { color:var(--muted); font-size:.8rem; }
+.rk-teks { width:100%; box-sizing:border-box; border:1px solid var(--stroke); border-radius:12px; padding:10px 12px; font:inherit; font-size:.82rem; line-height:1.5; background:#fff; color:var(--text); resize:vertical; min-height:140px; }
+.rk-kirim { display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.rk-kirim label { flex:1 1 170px; margin:0; font-size:.76rem; font-weight:600; }
+.rk-kirim input { display:block; width:100%; margin-top:4px; padding:8px 12px; border:1px solid var(--stroke); border-radius:12px; font:inherit; font-size:.86rem; background:#fff; }
+.galat-rk { background:var(--bad-bg); color:var(--bad); border-radius:14px; padding:12px 16px; }
