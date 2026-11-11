@@ -7,11 +7,15 @@
   const sb = B.sb;
   const idn = (n) => Number(n || 0).toLocaleString('id-ID');
   const HAL = 25;
-  const S = { lokasi: [], tab: 'form', lf: { cari: '', hal: 0, total: 0, dimuat: false }, lm: { cari: '', hal: 0, total: 0, dimuat: false }, peserta: new Map(), nikOtomatis: false };
+  const S = { lokasi: [], namaForm: new Map(), tab: 'form', lf: { cari: '', lok: '', hal: 0, total: 0, dimuat: false }, lm: { cari: '', lok: '', hal: 0, total: 0, dimuat: false }, peserta: new Map(), nikOtomatis: false };
 
   const digits = (s) => String(s || '').replace(/\D/g, '');
   const mask = (n) => (n && n.length >= 8 ? n.slice(0, 4) + '••••••••' + n.slice(-3) : n || '');
   const opsiLokasi = () => '<option value="">— pilih lokasi —</option>' + S.lokasi.map((l) => `<option value="${l.id}">${esc(l.nama)}</option>`).join('');
+  const kutip = (s) => '"' + String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+  // baris Form milik satu lokasi: sudah terhubung ke lokasi itu, atau nama lokasi di Form sama dengan nama Form lokasi tsb
+  const kondisiLokasi = (id) => { const nf = S.namaForm.get(Number(id)); return 'lokasi_id.eq.' + id + (nf ? ',lokasi_form.ilike.' + kutip(nf) : ''); };
+  const opsiFilter = () => '<option value="">Semua lokasi</option>' + S.lokasi.map((l) => `<option value="${l.id}">${esc(l.nama)}</option>`).join('');
   const nilaiLokasi = (q) => S.lokasi.filter((l) => l.nama.toLowerCase().includes(q.toLowerCase())).map((l) => l.id);
 
   // ---------- umum ----------
@@ -30,7 +34,10 @@
   async function muatFormList() {
     const st = S.lf; const q = B.aman(st.cari);
     let s = sb.from('form_jawaban').select('id,kunci,waktu,lokasi_form,nama,peserta_id', { count: 'exact' }).eq('dibatalkan', false).eq('hilang', false);
-    if (q) s = s.or('nama.ilike.%' + q + '%,lokasi_form.ilike.%' + q + '%');
+    const cariF = 'or(nama.ilike.%' + q + '%,lokasi_form.ilike.%' + q + '%)';
+    if (st.lok && q) s = s.or('and(or(' + kondisiLokasi(st.lok) + '),' + cariF + ')');
+    else if (st.lok) s = s.or(kondisiLokasi(st.lok));
+    else if (q) s = s.or('nama.ilike.%' + q + '%,lokasi_form.ilike.%' + q + '%');
     const { data, count, error } = await s.order('waktu', { ascending: false, nullsFirst: false }).range(st.hal * HAL, st.hal * HAL + HAL - 1);
     if (error) { $('lf-isi').innerHTML = `<tr><td colspan="6" class="kosong-t">Gagal dimuat: ${esc(B.galat(error))}</td></tr>`; return; }
     st.total = count || 0; st.dimuat = true;
@@ -84,6 +91,7 @@
   async function muatMasterList() {
     const st = S.lm; const q = B.aman(st.cari);
     let s = sb.from('peserta').select('id,nama,lokasi_id', { count: 'exact' }).eq('aktif', true);
+    if (st.lok) s = s.eq('lokasi_id', Number(st.lok));
     if (digits(q).length === 16 && digits(q) === q) {
       const a = await sb.from('peserta_sensitif').select('peserta_id').eq('nik', q);
       const ids = (a.data || []).map((x) => x.peserta_id);
@@ -132,7 +140,8 @@
   // ---------- tab, info, masuk ----------
   function tampilInfo() {
     const st = S.tab === 'form' ? S.lf : S.lm;
-    $('info').textContent = (S.tab === 'form' ? 'Data Google Form: ' : 'Data master: ') + idn(st.total) + ' anggota';
+    const lok = st.lok ? (S.lokasi.find((l) => String(l.id) === String(st.lok)) || {}).nama : '';
+    $('info').textContent = (S.tab === 'form' ? 'Data Google Form: ' : 'Data master: ') + idn(st.total) + ' anggota' + (lok ? ' di ' + lok : '');
   }
   function pilihTab(t) {
     S.tab = t;
@@ -160,10 +169,12 @@
     await B.muatSesi(); gambarAkun();
     if (!B.admin()) return gerbang();
     $('gerbang').hidden = true; $('isi').hidden = false; $('subtabs').hidden = false;
-    S.lf = { cari: '', hal: 0, total: 0, dimuat: false }; S.lm = { cari: '', hal: 0, total: 0, dimuat: false };
+    S.lf = { cari: '', lok: '', hal: 0, total: 0, dimuat: false }; S.lm = { cari: '', lok: '', hal: 0, total: 0, dimuat: false };
     try { S.lokasi = await B.semua(() => sb.from('lokasi').select('id,nama').order('nama')); }
     catch (e) { $('info').textContent = 'Data gagal dimuat: ' + B.galat(e); return; }
+    try { const pm = await B.semua(() => sb.from('pemetaan_lokasi').select('lokasi_id,nama_form')); S.namaForm = new Map(pm.filter((x) => x.nama_form).map((x) => [x.lokasi_id, x.nama_form])); } catch (e) { S.namaForm = new Map(); }
     $('ff-lokasi').innerHTML = opsiLokasi(); $('fm-lokasi').innerHTML = opsiLokasi();
+    $('lf-lok').innerHTML = opsiFilter(); $('lm-lok').innerHTML = opsiFilter();
     pilihTab(S.tab);
   }
 
@@ -190,6 +201,8 @@
   $('fm-nik').addEventListener('input', hitungNik); $('fm-nik').addEventListener('blur', hitungNik);
   $('lf-cari').oninput = tunda((e) => { S.lf.cari = e.target.value; S.lf.hal = 0; muatFormList(); });
   $('lm-cari').oninput = tunda((e) => { S.lm.cari = e.target.value; S.lm.hal = 0; muatMasterList(); });
+  $('lf-lok').onchange = (e) => { S.lf.lok = e.target.value; S.lf.hal = 0; muatFormList(); };
+  $('lm-lok').onchange = (e) => { S.lm.lok = e.target.value; S.lm.hal = 0; muatMasterList(); };
   $('batal-masuk').onclick = () => $('dlg-masuk').close();
   $('form-masuk').onsubmit = async (e) => {
     e.preventDefault();
