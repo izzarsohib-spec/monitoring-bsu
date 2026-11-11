@@ -4,32 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>Perlu tindakan · Monitoring BSU 2026</title>
+<title>Kelola anggota · Monitoring BSU 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="tema.css">
 <link rel="stylesheet" href="tema-terang.css">
 <link rel="stylesheet" href="tambah-pantau.css">
-<link rel="stylesheet" href="tindakan.css">
+<link rel="stylesheet" href="anggota.css">
 </head>
 <body>
 <div class="shell">
   <aside class="side">
     <a class="home" href="index.html" title="Monitoring BSU" aria-label="Monitoring BSU"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Monitoring BSU</span></a>
     <button data-href="index.html" title="Monitoring Pengisian" aria-label="Monitoring Pengisian"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Monitoring Pengisian</span></button>
-    <button class="on" data-href="admin.html" title="Perlu tindakan" aria-label="Perlu tindakan"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg><span>Perlu tindakan</span></button>
-    <button data-href="admin-lama.html#admin" title="Data lama (semua tab)" aria-label="Data lama"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span>Data lama (semua tab)</span></button>
+    <button class="on" data-href="admin.html" title="Kelola anggota" aria-label="Kelola anggota"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M18 8v6M15 11h6"/></svg><span>Kelola anggota</span></button>
     <div class="sp"></div>
   </aside>
 
   <div class="content">
-   <nav class="mobnav" id="mobnav"><button data-href="index.html">Monitoring</button><button class="on" data-href="admin.html">Perlu tindakan</button><button data-href="admin-lama.html#admin">Data lama</button></nav>
+   <nav class="mobnav" id="mobnav"><button data-href="index.html">Monitoring</button><button class="on" data-href="admin.html">Kelola anggota</button></nav>
+   <nav class="chips subtabs" id="subtabs" hidden>
+     <button class="chip on" data-tab="form">Data Google Form</button>
+     <button class="chip" data-tab="master">Data master</button>
+   </nav>
 
-   <div class="page" id="pg-tindakan">
+   <div class="page" id="pg-anggota">
     <header>
       <div>
-        <h1>Perlu tindakan</h1>
-        <div class="sub" id="info">Memuat data…</div>
+        <h1>Kelola anggota</h1>
+        <div class="sub" id="info">Memuat…</div>
       </div>
       <div id="akun"></div>
     </header>
@@ -37,37 +40,49 @@
     <div id="gerbang" hidden></div>
 
     <div id="isi" hidden>
-      <section class="top tindakan-atas">
-        <div class="card ringkas-t">
-          <div class="rt-judul"><small>Data yang belum cocok</small><b class="num" id="rtTotal">-</b><span>orang menunggu keputusan</span></div>
-          <div class="rt-bagi" id="rtBagi"></div>
-        </div>
-        <div class="card cara">
-          <b>Cara kerja halaman ini</b>
-          <ol>
-            <li>Pilih satu orang di daftar kiri.</li>
-            <li>Baca apa yang terjadi, lalu pilih satu tindakan di kanan.</li>
-            <li>Setelah disimpan, orang itu hilang dari daftar dan yang berikutnya terbuka.</li>
-          </ol>
-        </div>
-      </section>
+      <!-- ============ DATA GOOGLE FORM ============ -->
+      <div id="tab-form">
+        <section class="card kartu">
+          <h3>Tambah anggota ke data Google Form</h3>
+          <p class="muted">Untuk anggota yang tidak bisa mengisi Form sendiri. Lokasi dan nama dipilih dari data master bila ada.</p>
+          <form id="f-form" class="isian" autocomplete="off">
+            <label>Lokasi<select id="ff-lokasi" required></select></label>
+            <label>Nama<input id="ff-nama" list="dl-nama" required placeholder="Ketik atau pilih nama"><datalist id="dl-nama"></datalist></label>
+            <label>No. HP<input id="ff-hp" inputmode="tel" placeholder="08xxxxxxxxxx"></label>
+            <label>No. rekening<input id="ff-rek" inputmode="numeric"></label>
+            <label>Nama pemilik rekening<input id="ff-namarek"></label>
+            <label>NIK <small>(opsional)</small><input id="ff-nik" inputmode="numeric" maxlength="16" placeholder="16 angka"></label>
+            <div class="catatan" id="ff-catatan">NIK terisi otomatis bila nama dipilih dari data master. Tanpa NIK, anggota baru terhitung "sudah mengisi" bila namanya persis sama dengan data master.</div>
+            <div class="aksi-form"><button class="btn utama" type="submit" id="ff-simpan">Tambahkan ke data Google Form</button></div>
+          </form>
+        </section>
+        <section class="card kartu">
+          <div class="bar-top"><h3>Anggota di data Google Form</h3>
+            <label class="search"><span aria-hidden="true">🔍</span><input id="lf-cari" type="search" placeholder="Cari nama atau lokasi" autocomplete="off"></label></div>
+          <div class="wrap"><table><thead><tr><th>Nama</th><th>Lokasi</th><th>Diisi</th><th>Asal</th><th>Terhubung ke master</th><th></th></tr></thead><tbody id="lf-isi"></tbody></table></div>
+          <div class="pager" id="lf-pager"></div>
+        </section>
+      </div>
 
-      <section class="bawah card" id="bawah">
-        <div class="bar-top">
-          <h3>Daftar orang</h3>
-          <label class="search"><span aria-hidden="true">🔍</span>
-            <input id="cari" type="search" placeholder="Cari nama atau lokasi" autocomplete="off">
-          </label>
-          <select id="fSumber" class="psel" aria-label="Asal data">
-            <option value="">Form dan BSU</option><option value="form">Hanya ada di Form</option><option value="bsu">Hanya ada di BSU</option><option value="dua">Ada di Form dan BSU</option>
-          </select>
-        </div>
-        <div class="chips" id="chips" style="margin-bottom:14px"></div>
-        <div class="layout">
-          <div class="list"><div class="scroll" id="daftar"></div></div>
-          <div class="detail" id="detail"></div>
-        </div>
-      </section>
+      <!-- ============ DATA MASTER ============ -->
+      <div id="tab-master" hidden>
+        <section class="card kartu">
+          <h3>Tambah anggota ke data master</h3>
+          <p class="muted">Data acuan: nama, lokasi, dan NIK. Anggota baru ikut dihitung sebagai target pengisian di lokasinya.</p>
+          <form id="f-master" class="isian" autocomplete="off">
+            <label>Lokasi<select id="fm-lokasi" required></select></label>
+            <label>Nama<input id="fm-nama" required></label>
+            <label>NIK <small id="fm-hitung">0/16</small><input id="fm-nik" inputmode="numeric" maxlength="16" required placeholder="16 angka"></label>
+            <div class="aksi-form"><button class="btn utama" type="submit" id="fm-simpan">Tambahkan ke data master</button></div>
+          </form>
+        </section>
+        <section class="card kartu">
+          <div class="bar-top"><h3>Anggota di data master</h3>
+            <label class="search"><span aria-hidden="true">🔍</span><input id="lm-cari" type="search" placeholder="Cari nama, lokasi, atau NIK lengkap" autocomplete="off"></label></div>
+          <div class="wrap"><table><thead><tr><th>Nama</th><th>Lokasi</th><th>NIK</th><th>Sudah isi Form</th><th></th></tr></thead><tbody id="lm-isi"></tbody></table></div>
+          <div class="pager" id="lm-pager"></div>
+        </section>
+      </div>
     </div>
    </div>
   </div>
@@ -88,6 +103,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="core.js"></script>
-<script src="tindakan.js"></script>
+<script src="anggota.js"></script>
 </body>
 </html>

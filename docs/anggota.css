@@ -1,0 +1,32 @@
+/* Halaman "Kelola anggota": kartu putih seperti halaman Monitoring; hanya tambahan untuk form dan tabel. */
+#isi[hidden], #gerbang[hidden], #tab-form[hidden], #tab-master[hidden] { display:none; }
+.kartu { padding:20px 22px; margin-bottom:16px; }
+.kartu h3 { margin:0 0 4px; font-size:1.05rem; }
+.kartu > .muted { margin:0 0 14px; }
+.isian { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px 18px; align-items:end; }
+.isian label { display:flex; flex-direction:column; gap:6px; font-size:.8rem; font-weight:600; }
+.isian label small { font-weight:400; color:var(--muted); }
+.isian input, .isian select { width:100%; padding:10px 14px; border:1px solid var(--stroke); border-radius:12px; font:inherit; font-size:.9rem; font-weight:400; background:#fff; color:var(--text); }
+.isian input:focus, .isian select:focus, .dlg input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,127,121,.14); }
+.isian input.ok { border-color:var(--ok); }
+.isian input.salah { border-color:var(--bad); }
+.catatan { grid-column:1 / -1; font-size:.8rem; color:var(--muted); background:var(--lembut); border-radius:12px; padding:10px 14px; }
+.catatan.ok { background:var(--ok-bg); color:var(--ok); }
+.aksi-form { grid-column:1 / -1; display:flex; justify-content:flex-end; }
+.btn.utama { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; padding:8px 20px; }
+.btn.utama:hover { background:#26665F; border-color:#26665F; color:#fff; }
+.btn.bahaya { border-color:var(--bad); color:var(--bad); }
+.btn.bahaya:hover { background:var(--bad-bg); color:var(--bad); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.kartu .wrap { max-height:none; }
+.kartu td, .kartu th { white-space:normal; }
+.kartu td .mono { font-family:ui-monospace,Consolas,monospace; letter-spacing:.03em; }
+.kartu .kosong-t { text-align:center; color:var(--muted); padding:26px; }
+.tag-a { display:inline-block; font-size:.72rem; font-weight:600; padding:2px 10px; border-radius:99px; background:var(--panel2); color:var(--muted); }
+.tag-a.ok { background:var(--ok-bg); color:var(--ok); }
+.tag-a.bad { background:var(--bad-bg); color:var(--bad); }
+.tag-a.manual { background:#F3E9D7; color:#8A6420; }
+.pager { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; font-size:.8rem; color:var(--muted); }
+.gerbang { text-align:center; padding:46px 24px; }
+.gerbang b { display:block; font-size:1.1rem; margin-bottom:6px; }
+.gerbang p { color:var(--muted); max-width:420px; margin:0 auto 16px; }

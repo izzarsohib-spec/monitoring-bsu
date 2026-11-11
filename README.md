@@ -29,8 +29,7 @@ Semua data ada di Supabase, schema `monitoring_bsu_2026` (terpisah dari tabel la
 | Pengguna | Bisa |
 |---|---|
 | Tanpa login | Melihat ringkasan jumlah per lokasi |
-| Operator | Melihat nama peserta dan hasil pencocokan |
-| Admin | Mengedit semua data, menyelesaikan pencocokan, melihat data pribadi (disamarkan), mengatur sinkron dan pengguna |
+| Admin | Melihat nama peserta, menambah dan menghapus anggota di data Google Form dan data master (halaman Kelola anggota) |
 
 Akses dijaga Row Level Security di database, bukan hanya di tampilan. Kunci `anon` di `docs/config.js` memang dirancang terlihat di browser.
 
